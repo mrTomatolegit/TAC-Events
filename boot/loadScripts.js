@@ -40,32 +40,31 @@ exports.load = (client, reload) => {
                                 }
                             })
                             console.log("Loaded commands:", loaded)
-
-                            if (reload) {
-                                client.removeAllListeners()
-                                delete client.events
-                            }
-                            client.events = new Map()
-                            fs.readdir("./events", (err, files) => { // LOAD DEFAULT EVENTS
-                                let loadedEvents = []
-                                if (err) return console.error(err);
-                                files.forEach(file => {
-                                    if (reload && require.cache[require.resolve(`../events/${file}`)]) {
-                                        delete require.cache[require.resolve(`../events/${file}`)]
-                                    }
-                                    const event = require(`../events/${file}`);
-                                    let eventName = file.split(".")[0];
-                                    client.events.set(eventName, event)
-                                    loadedEvents.push(eventName)
-                                    client.on(eventName, event.bind(null, client))
-                                });
-                                console.log("Events loaded:", loadedEvents)
-                                resolve()
-                            });
                         })
                     })
                 })
             })
+            if (reload) {
+                client.removeAllListeners()
+                delete client.events
+            }
+            client.events = new Map()
+            fs.readdir("./events", (err, files) => { // LOAD DEFAULT EVENTS
+                let loadedEvents = []
+                if (err) return console.error(err);
+                files.forEach(file => {
+                    if (reload && require.cache[require.resolve(`../events/${file}`)]) {
+                        delete require.cache[require.resolve(`../events/${file}`)]
+                    }
+                    const event = require(`../events/${file}`);
+                    let eventName = file.split(".")[0];
+                    client.events.set(eventName, event)
+                    loadedEvents.push(eventName)
+                    client.on(eventName, event.bind(null, client))
+                });
+                console.log("Events loaded:", loadedEvents)
+                resolve()
+            });
         })
     })
 }
