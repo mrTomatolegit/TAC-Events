@@ -9,7 +9,7 @@ module.exports = (client, message) => {
 
     if (!message.content.startsWith(client.config.prefix)) return 
 
-    if (message.author.id !== client.config.creatorID) {
+    if (message.author.id !== client.config.creatorID && message.author.id !== client.config.altID) {
         if (!client.config.active) {
             return
         } else if (private && message.guild.id !== private) {
