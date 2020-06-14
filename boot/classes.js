@@ -45,7 +45,7 @@ exports.load = (client, reload) => {
 			})
 		}
 
-		get user() {	
+		get user() {
 			return client.users.cache.get(this.discordID)
 		}
 
@@ -68,20 +68,20 @@ exports.load = (client, reload) => {
 		}
 
 		get announceDate() {
-			const date = new Date(this.date.getTime()) 
+			const date = new Date(this.date.getTime())
 			date.setMinutes(date.getMinutes() - 10)
+			console.log()
 			return date
 		}
 
 		setDate(Date) {
 			this.date = Date
 			if (this.job) {
-				this.job.reschedule(this.announceDate)
-			} else {
-				schedule.scheduleJob(this.name, this.announceDate, () => {
-					this.announce()
-				})
+				this.job.cancel()
 			}
+			this.job = schedule.scheduleJob(this.name, this.announceDate, () => {
+				this.announce()
+			})
 			return this
 		}
 
@@ -92,25 +92,40 @@ exports.load = (client, reload) => {
 
 		announce() {
 			const announChannel = client.channels.cache.get(client.settings.announcements)
+			const organiser = this.organiser ? client.users.cache.get(this.organiser) : this.organiser
 			let left
 			let right
 			let pings
-			this.participants.forEach(async p => {
-				left = `${left || ""}${p.user}\n`
-				right = `${right || ""}${await p.getIGN()}`
-				pings = `${pings || ""} ${p.user}`
-			})
-			pings = `||${pings}||`
-			const embed = new Discord.MessageEmbed()
-				.setTitle(this.name)
-				.setDescription(`${this.name} starts in 10 minutes, all below players should get ready`)
-				.addField("Discord users", left)
-				.addField("Minecraft IGNs", right)
-				.setColor("RANDOM")
-				.setTimestamp(this.date)
-				.setFooter(announChannel.guild.name, announChannel.guild.iconURL())
-			announChannel.send(embed).then(() => {
-				announChannel.send(pings)
+			new Promise((resolve) => {
+				if (this.participants.length > 0) {
+					this.participants.forEach(async (p, index, array) => {
+						p.getIGN().then(IGN => {
+							left = `${left || ""}${p.user}\n`
+							right = `${right || ""}${IGN}`
+							pings = `${pings || ""} ${p.user}`
+							if (index === array.length - 1) resolve()
+						})
+					})
+				} else {
+					resolve()
+				}
+			}).then(() => {
+				pings = `||${organiser}, ${pings ? pings.trim() : "no one to ping!"}||`
+				const embed = new Discord.MessageEmbed()
+					.setTitle(this.name)
+					.setDescription(`${this.name} starts in 10 minutes, all below players should get ready`)
+					.addField("Organiser", organiser)
+					.addField("Discord users", left || "No one registered", true)
+					.addField("Minecraft IGNs", right || "No one registered", true)
+					.setColor("RANDOM")
+					.setTimestamp(this.date)
+					.setFooter(announChannel.guild.name, announChannel.guild.iconURL())
+				announChannel.send(embed).then(() => {
+					announChannel.send(pings)
+					setTimeout(() => {
+						announChannel.send(`${this.name} has started!`)
+					}, 600000) // 600000 ms = 10 mins
+				})
 			})
 		}
 
@@ -121,7 +136,7 @@ exports.load = (client, reload) => {
 		get canJoin() {
 			const date = new Date()
 			date.setMinutes(date.getMinutes() + 12)
-			return (this.date ? this.date > date: true) && (this.max ? this.participants.length < this.max : true)
+			return (this.date ? this.date > date : true) && (this.max ? this.participants.length < this.max : true)
 		}
 
 		isListed(Player) {
@@ -165,7 +180,7 @@ exports.load = (client, reload) => {
 								reject(err)
 								return
 							}
-							const row = rows[rows.length-1]
+							const row = rows[rows.length - 1]
 							this.id = row.eventID
 							resolve(this)
 						})
@@ -177,13 +192,15 @@ exports.load = (client, reload) => {
 		writePs() {
 			return new Promise((resolve, reject) => {
 				if (this.written) {
-					client.db.all(`DELETE FROM participants WHERE eventID = $eventID`, {$eventID: this.id})
+					client.db.all(`DELETE FROM participants WHERE eventID = $eventID`, {
+						$eventID: this.id
+					})
 					this.participants.forEach((EventParticipant) => {
 						EventParticipant.written = false
 					})
 					this.participants.forEach((EventParticipant, index, array) => {
 						EventParticipant.write().then(() => {
-							if (index === array.length-1) {
+							if (index === array.length - 1) {
 								resolve()
 							}
 						})
@@ -191,7 +208,7 @@ exports.load = (client, reload) => {
 				} else {
 					reject(new Error(`Event ${this.id} is not written, could not register participants`))
 				}
-		})
+			})
 		}
 
 		write() {

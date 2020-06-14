@@ -21,6 +21,11 @@ exports.run = (client, message, [eventID]) => {
 		return
 	}
 
+	if (!event.canJoin) {
+		message.channel.send(`You can't leave this event now!`)
+		return
+	}
+
 	if (!event.isListed(player)) {
 		message.channel.send("You are not signed up for `" + event.name + "`!")
 		return

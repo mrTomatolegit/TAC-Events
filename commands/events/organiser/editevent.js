@@ -41,18 +41,18 @@ exports.run = (client, message, [eventID, option]) => {
 	}
 	eventID = parseInt(eventID)
 
+	const event = client.events.find(e => e.id === eventID)
+	if (!event) {
+		message.channel.send("That Event ID is not linked to an event")
+		return
+	}
+
 	if (!option) {
 		message.channel.send("You need to tell me what to modify!")
 		return
 	}
 
 	option = option.toLowerCase()
-
-	const event = client.events.find(e => e.id === eventID)
-	if (!event) {
-		message.channel.send("That Event ID is not linked to an event")
-		return
-	}
 
 	if (option === "name") {
 		message.channel.send("What would you like to set the event name as?").then(m => {
