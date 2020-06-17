@@ -1,5 +1,6 @@
 const schedule = require("node-schedule")
 const Discord = require("discord.js")
+const Hypixel = require("hypixel")
 exports.load = (client, reload) => {
 	client.Player = class Player {
 		constructor(ID, UUID, written) {
@@ -26,7 +27,7 @@ exports.load = (client, reload) => {
 					})
 				})
 			} else {
-				client.db.all(`UPDATE registry SET discordID = $discordID, minecraftUUID = $minecraftUUID`, {
+				client.db.all(`UPDATE registry SET minecraftUUID = $minecraftUUID WHERE discordID = $discordID`, {
 					$discordID: this.discordID,
 					$minecraftUUID: this.minecraftUUID
 				}, (err, out) => {
@@ -265,6 +266,70 @@ exports.load = (client, reload) => {
 			this.event.participants.splice(index, 1);
 			delete this
 			return null
+		}
+	}
+	client.HypixelKeyManager = class HypixelKeyManager {
+		constructor() {
+			this.index = 0
+			this.keys = []
+			this.keymap = new Map()
+		}
+		/**
+		 * Returns the last index of the keys array
+		 */
+		get maxIndex() {
+			return this.keys.length - 1
+		}
+
+		/**
+		 * Returns the amount of keys registered
+		 */
+		get length() {
+			return this.keys.length
+		}
+
+		/**
+		 * Adds an api key to the manager's array
+		 * @param {string} key - The hypixel api key to add 
+		 */
+		add(key) {
+			const thing = new Hypixel({
+				key: key
+			});
+			const index = this.keys.push(thing)
+			this.keymap.set(key, index)
+		}
+
+		/**
+		 * Removes an api key from the manager's array
+		 * @param {string} key - The hypixel api key to remove
+		 */
+		remove(key) {
+			const index = this.keymap.get(key)
+			if (index) {
+				this.keys.splice(index, 1)
+				this.keymap.delete(key)
+			}
+		}
+		/**
+		 * Returns the next key
+		 */
+		next() {
+			this.index++
+			if (this.index > this.maxIndex) {
+				this.index = 0
+			}
+			return this.keys[this.index]
+		}
+		/**
+		 * Returns the previous key
+		 */
+		previous() {
+			this.index--
+			if (this.index < 0) {
+				this.index = this.maxIndex
+			}
+			return this.keys[this.index]
 		}
 	}
 }
