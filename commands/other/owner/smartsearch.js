@@ -1,6 +1,6 @@
 exports.info = {
     info: "Does this even work?",
-    format: "",
+    format: "[send log]",
     aliases: [],
     hidden: true
 }
@@ -21,7 +21,7 @@ const {
 } = require("console")
 const fs = require("fs")
 
-exports.run = async (client, message) => {
+exports.run = async (client, message, [sendlogs]) => {
     if (whitelist.includes(message.author.id)) {
         fs.writeFileSync("./data/smartsearch.log", "")
         const logger = new Console({
@@ -62,6 +62,9 @@ exports.run = async (client, message) => {
             }, 3000)
             search.on("done", () => {
                 holymessage.edit(embedstart().setColor("GREEN"))
+                if (sendlogs) {
+                    message.channel.send({files: ["./data/smartsearch.log"]})
+                }
                 clearInterval(interval)
             })
             client.guilds.cache.forEach(guild => {
