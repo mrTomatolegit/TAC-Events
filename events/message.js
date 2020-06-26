@@ -18,7 +18,7 @@ module.exports = (client, message) => {
     }
 
     const args = message.content.slice(client.config.prefix.length).trim().split(/ +/g);
-    const command = args.shift().toLowerCase()
+    const command = args.shift().toLowerCase().trim()
 
     const commandManager = client.commandManager
 

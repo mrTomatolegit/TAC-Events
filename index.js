@@ -1,6 +1,13 @@
 require('dotenv').config()
 const Discord = require("discord.js");
+const EventsAPI = require("./EventsAPI")
 const client = new Discord.Client();
+const sqlite = require("sqlite3")
+client.db = new sqlite.Database("./EventsAPI/src/client/TACEvents.db")
+client.events = new EventsAPI.EventManager(client)
+client.players = new EventsAPI.PlayerManager(client)
+client.settings = new EventsAPI.SettingsManager(client)
+client.announcements = new EventsAPI.AnnounceManager(client)
 
 const fs = require("fs");
 client.start = (reload) => {
@@ -38,65 +45,25 @@ client.start().then(o => {
     console.error(e)
 })
 
+const logs = fs.createWriteStream("./data/logs.log", "utf8")
 client.log = (text) => {
     console.log(text)
-    fs.readFile("./data/logs.log", "utf8", (err, content) => {
-        if (err) {
-            console.error(err)
-            return false
-        }
-        const date = new Date()
-        const dateFormat = `${date.getUTCDate()}-${date.getUTCMonth()+1}-${date.getUTCFullYear()} ${date.getUTCHours()}:${date.getUTCMinutes()}:${date.getUTCSeconds()}.${date.getUTCMilliseconds()}`
-        const finished = `[${dateFormat}] ${text}\n\n${content}`.substr(0, 100000)
-        fs.writeFile("./data/logs.log", finished, "utf8", (err) => {
-            if (err) {
-                console.error(err)
-                return false
-            }
-            return true
-        })
-    })
-}
-client.error = (text) => {
-    console.error(text.stack || text)
-    fs.readFile("./data/logs.log", "utf8", (err, content) => {
-        if (err) {
-            console.error(err)
-            return false
-        }
-        const date = new Date()
-        const dateFormat = `${date.getUTCDate()}-${date.getUTCMonth()+1}-${date.getUTCFullYear()} ${date.getUTCHours()}:${date.getUTCMinutes()}:${date.getUTCSeconds()}.${date.getUTCMilliseconds()}`
-        const finished = `[${dateFormat}] ${text.stack || text}\n\n${content}`.substr(0, 100000)
-        fs.writeFile("./data/logs.log", finished, "utf8", (err) => {
-            if (err) {
-                console.error(err.stack || err)
-                return false
-            }
-            return true
-        })
-    })
-    fs.readFile("./data/errors.log", "utf8", (err, content) => {
-        if (err) {
-            console.error(err)
-            return false
-        }
-        const date = new Date()
-        const dateFormat = `${date.getUTCDate()}-${date.getUTCMonth()+1}-${date.getUTCFullYear()} ${date.getUTCHours()}:${date.getUTCMinutes()}:${date.getUTCSeconds()}.${date.getUTCMilliseconds()}`
-        const finished = `[${dateFormat}] ${text.stack || text}\n\n${content}`.substr(0, 100000)
-        fs.writeFile("./data/errors.log", finished, "utf8", (err) => {
-            if (err) {
-                console.error(err.stack || err)
-                return false
-            }
-            return true
-        })
-    })
-    client.channels.cache.get("705373055689424896").send(`<@337266897458429956>, ${text.message || text}`)
+    const date = new Date()
+    const dateFormat = `${date.getUTCDate()}-${date.getUTCMonth()+1}-${date.getUTCFullYear()} ${date.getUTCHours()}:${date.getUTCMinutes()}:${date.getUTCSeconds()}.${date.getUTCMilliseconds()}`
+    logs.write(`\n\n[${dateFormat}] ${text}`)
 }
 
-process.on("beforeExit", async (code) => {
+const errors = fs.createWriteStream("./data/errors.log")
+client.error = (text) => {
+    console.error(text.stack || text)
+    const date = new Date()
+    const dateFormat = `${date.getUTCDate()}-${date.getUTCMonth()+1}-${date.getUTCFullYear()} ${date.getUTCHours()}:${date.getUTCMinutes()}:${date.getUTCSeconds()}.${date.getUTCMilliseconds()}`
+    logs.write(`\n\n[${dateFormat}] ${text.stack || text}`)
+    errors.write(`\n\n[${dateFormat}] ${text.stack || text}`)
+}
+
+process.on("beforeExit", async () => {
     client.destroy()
-    client.log("Process exited with code " + code)
 })
 
 client.login(process.env.token)

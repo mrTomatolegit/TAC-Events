@@ -7,7 +7,7 @@ exports.info = {
 
 exports.run = (client, message, [eventID]) => {
 
-	const player = client.players.find(p => p.discordID === message.author.id)
+	const player = client.players.get(message.author.id)
 
 	if (!player) {
 		message.channel.send(`You are not registered! Register using \`${client.config.prefix}register <Minecraft IGN>\``)
@@ -15,24 +15,28 @@ exports.run = (client, message, [eventID]) => {
 	}
 	eventID = parseInt(eventID)
 
-	const event = client.events.find(e => e.id === eventID) || client.events.find(e => e.canJoin == true)
+	console.log(client.events.find(e => e.canJoin == true))
+	
+	const event = client.events.get(eventID) || client.events.find(e => e.canJoin == true)
 	if (!event) {
 		message.channel.send("No event found")
 		return
 	}
 
+	
+
 	if (!event.canJoin) {
-		const reason = event.participants.length < event.max ? "registry time has run out (15 minutes before the event)" : "max participants reached"
+		const reason = event.participants.size < (event.max || 10000000) ? "registry time has run out (15 minutes before the event)" : "max participants reached"
 		message.channel.send(`You can no longer join that event, ${reason}`)
 		return
 	}
 
-	if (event.isListed(player)) {
+	if (event.participants.get(player.discord)) {
 		message.channel.send("You already signed up for `" + event.name + "`!")
 		return
 	}
 
-	event.addParticipant(player).writePs().then(() => {
+	event.participants.add(player).write().then(() => {
 		message.channel.send(`You have been listed as a participant for \`${event.name}\``)
 	})
 }

@@ -1,7 +1,7 @@
 exports.info = {
 	info: "Lists all of the events registered or info about a specific event",
 	format: "[Event ID]",
-	aliases: ["list", "event", "events"],
+	aliases: ["list", "eventlist"],
 	hidden: false
 }
 
@@ -13,7 +13,7 @@ const formatDate = (date) => {
 	if (date == null) {
 		return "null"
 	}
-	return `${date.getUTCDate().toString().padStart(2, "0")}/${(date.getUTCMonth()+1).toString().padStart(2, "0")}/${date.getUTCFullYear()} ${date.getUTCHours().toString().padStart(2, "0")}:${date.getUTCMinutes().toString().padStart(2, "0")}`
+	return `${date.getUTCDate().toString().padStart(2, "0")}/${(date.getUTCMonth()+1).toString().padStart(2, "0")}/${date.getUTCFullYear().toString().substr(2)} ${date.getUTCHours().toString().padStart(2, "0")}:${date.getUTCMinutes().toString().padStart(2, "0")}`
 }
 
 exports.run = (client, message, [eventID]) => {
@@ -42,23 +42,32 @@ exports.run = (client, message, [eventID]) => {
 	}
 	if (!isNaN(eventID)) {
 		eventID = parseInt(eventID)
-		const event = client.events.find(e => e.id === eventID)
+		const event = client.events.get(eventID)
 		if (event) {
 			let left
 			let right
 			new Promise((resolve) => {
-				if (this.participants) {
-					this.participants.forEach(async (p, index, array) => {
-						p.getIGN().then(IGN => {
-							left = `${left || ""}${p.user}\n`
+				console.log(event.participants)
+				console.log(event.participants.size)
+				if (event.participants) {
+					console.log("shit")
+					let i = 0
+					event.participants.forEach(async (p, index, map) => {
+						console.log("works")
+						p.player.getIGN().then(IGN => {
+							console.log("aaa")
+							left = `${left || ""}${p.player.user}\n`
 							right = `${right || ""}${IGN}`
-							if (index === array.length - 1) resolve()
+							console.log(index, map.size - 1)
+							if (i === map.size-1) resolve()
+							i++
 						})
 					})
 				} else {
 					resolve()
 				}
 			}).then(() => {
+				console.log("aa2aa")
 				const organiser = client.users.cache.get(event.organiser)
 				const embed = new Discord.MessageEmbed()
 					.setTitle(event.name)
@@ -67,12 +76,12 @@ exports.run = (client, message, [eventID]) => {
 					.setFooter(message.guild.name, message.guild.iconURL())
 					.setTimestamp(event.date)
 					.addField("Organiser", organiser ? `${organiser.tag} ||${organiser}||` : event.organiser)
-					.addField("Date", event.date.toUTCString())
+					.addField("Date", event.date ? event.date.toUTCString(): "No date")
 					.addField("Maximum participants", event.max)
 					.addField("Discord", left || "No participants", true)
 					.addField("Minecraft", right || "No participants", true)
 					.setColor("RANDOM")
-				message.channel.send(embed)
+				message.channel.send({embed})
 			})
 			return
 		}
@@ -85,8 +94,10 @@ exports.run = (client, message, [eventID]) => {
 		.setColor("RANDOM")
 		.setTimestamp()
 	let page = 0
-	const maxPages = Math.floor((client.events.length - 1) / eventsPerPage)
-	message.channel.send(embed.setDescription(getPage(page))).then(m => {
+	const maxPages = Math.floor((client.events.size - 1) / eventsPerPage)
+	let firstEmbed = embed.setDescription(getPage(page))
+	console.log(firstEmbed)
+	message.channel.send(firstEmbed).then(m => {
 		emojis.forEach(async emoji => {
 			await m.react(emoji)
 		})

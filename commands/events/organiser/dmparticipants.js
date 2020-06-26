@@ -9,19 +9,19 @@ const Discord = require('discord.js')
 
 exports.run = (client, message, [eventID]) => {
 
-    if (!message.member.roles.cache.find(r => r.id === client.settings.manager)) {
+    if (!message.member.roles.cache.find(r => r.id === client.settings.organiser)) {
         message.channel.send("You must be the event manager to do this!")
         return
     }
 
-    const event = client.events.find(e => e.id === eventID) || client.events.find(e => e.canJoin == true)
+    const event = client.events.get(parseInt(eventID)) || client.events.find(e => e.canJoin == true)
     if (!event) {
         message.channel.send("No event found")
         return
     }
     const participants = event.participants
 
-    if (!participants || participants.length < 1) {
+    if (!participants || participants.size < 1) {
         message.channel.send("I couldn't find any participants")
         return
     }
@@ -41,29 +41,35 @@ exports.run = (client, message, [eventID]) => {
                 .setDescription(text)
                 .addField("Event name", event.name, true)
                 .addField("Event ID", event.id, true)
-                .addField("Event date", event.date.toUTCString(), true)
                 .setColor("RANDOM")
+                .setFooter("Event date")
+                .setTimestamp(event.date)
             let succeeded = []
             let failures = []
+            const successPercentage = () => {
+                let total = succeeded.length + failures.length
+                return succeeded.length * 100 / total
+            }
             const stats = () => {
                 message.channel.send(new Discord.MessageEmbed()
                     .setTitle("DM all stats")
                     .setDescription("The failed users have their DMs locked, this is a 'problem' on their side")
                     .addField("Succeeded", succeeded.join("\n") || "No succeeds", true)
-                    .addField("Failuers", failures.join("\n") || "No failures", true)
+                    .addField("Failures", failures.join("\n") || "No failures", true)
                     .setColor("RANDOM")
+                    .setFooter(`Success rate: ${successPercentage()}%`)
                 )
             }
             participants.forEach((p, index, array) => {
-                p.user.send(embed).then(() => {
-                    succeeded.push(p.user)
-                    if (index === array.length - 1) {
+                p.player.user.send(embed).then(() => {
+                    succeeded.push(p.player.user)
+                    if (index === array.last().player.discord) {
                         stats()
                     }
                 }).catch((e) => {
                     console.error(e)
-                    failures.push(p.user)
-                    if (index === array.length - 1) {
+                    failures.push(p.player.user)
+                    if (index === array.last().player.discord) {
                         stats()
                     }
                 })

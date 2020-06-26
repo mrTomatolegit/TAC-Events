@@ -18,7 +18,7 @@ exports.run = (client, message, [eventID]) => {
 		}
 	}
 
-	const event = client.events.find(e => e.id === eventID) || client.events.find(e => e.canJoin == true)
+	const event = client.events.get(parseInt(eventID)) || client.events.find(e => e.canJoin == true)
 	if (!event) {
 		message.channel.send("No event found")
 		return
@@ -39,7 +39,7 @@ exports.run = (client, message, [eventID]) => {
 				return
 			}
 			const embed = new Discord.MessageEmbed()
-				.setAuthor(message.author.tag + " (TAC event participant)", message.author.avatarURL())
+				.setAuthor(message.author.tag + " (player)", message.author.avatarURL())
 				.setDescription(text)
 				.addField("Event name", event.name, true)
 				.addField("Event ID", event.id, true)

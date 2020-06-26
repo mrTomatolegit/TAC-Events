@@ -15,9 +15,14 @@ exports.run = (client, message, [eventID]) => {
 	}
 	eventID = parseInt(eventID)
 
-	const event = client.events.find(e => e.id === eventID) || client.events.find(e => e.canJoin == true)
+	const event = client.events.get(eventID) || client.events.find(e => e.canJoin == true)
 	if (!event) {
 		message.channel.send("No event found")
+		return
+	}
+
+	if (!event.isListed(player)) {
+		message.channel.send("You are not signed up for `" + event.name + "`!")
 		return
 	}
 
@@ -26,11 +31,6 @@ exports.run = (client, message, [eventID]) => {
 		return
 	}
 
-	if (!event.isListed(player)) {
-		message.channel.send("You are not signed up for `" + event.name + "`!")
-		return
-	}
-    event.getParticipant(player).leave()
-    event.writePs()
+    event.participants.remove(player)
 	message.channel.send(`You have been removed from the participant list for \`${event.name}\``)
 }

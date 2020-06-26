@@ -1,3 +1,5 @@
+
+
 exports.info = {
     info: "Creates a new event",
     format: "<Event name>",
@@ -22,11 +24,14 @@ const findDate = (m3content) => {
     date.setUTCMinutes(finds[4])
     date.setUTCSeconds(0)
     date.setUTCMilliseconds(0)
+    if (m3content.toLowerCase().includes("pm")) {
+        date.setUTCHours(date.getUTCHours() + 12)
+    }
     return date
 }
 
 exports.run = (client, message, args) => {
-    if (!message.member.roles.cache.find(r => r.id === client.settings.manager)) {
+    if (!message.member.roles.cache.find(r => r.id === client.settings.organiser)) {
         message.channel.send("You must be the event manager to do this!")
         return
     }
@@ -43,21 +48,24 @@ exports.run = (client, message, args) => {
                 message.channel.send("Event creation canceled")
                 return
             }
-            const event = client.newEvent(eventName, null, message.author.id)
-            message.channel.send(`Event with the name \`${event.name}\` was created, when should it be? DD/MM/YY HH:MN (GMT)  or  "null"`).then(m2 => {
+            const event = client.events.create()
+            event.setName(eventName)
+            event.setOrganiser(message.author.id)
+            message.channel.send(`Event with the name \`${event.name}\` was created, when should it be? DD/MM/YY HH:MN (am or pm)  or  "null"\nDate must be in GMT (UTC)`).then(m2 => {
                 m2.channel.awaitMessages(m => m.author.id === message.author.id, {max: 1}).then(m3 => {
                     m3 = m3.first()
-                    console.log(m3.content)
                     const foundDate = findDate(m3.content)
+                    if (foundDate < new Date()) {
+                        message.channel.send("The date you gave me is inferior to our time now... but ok :p")
+                    }
                     event.setDate(foundDate)
                     message.channel.send(`Date was set to \`${event.date ? event.date.toUTCString() : null}\`, how many participants can there be? any number or "null"`).then(m4 => {
                         m4.channel.awaitMessages(m => m.author.id === message.author.id, {max: 1}).then(m => {
                             m = m.first()
-                            console.log(m.content)
                             if (!isNaN(m.content)) {
                                 event.setMax(parseInt(m.content))
                             }
-                            event.writeE()
+                            event.write()
                             message.channel.send(`Max participants was set as \`${event.max}\`, you can edit your event with \`${client.config.prefix}editevent\``)
                         })
                     })

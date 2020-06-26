@@ -6,27 +6,30 @@ exports.info = {
 }
 
 const findDate = (m3content) => {
-	const dateRegex = new RegExp(/[0-9]{1,2}/g)
-	const finds = m3content.match(dateRegex)
-	if (!finds || finds.length < 5) {
-		return null
-	}
-	finds.forEach((find, index) => {
-		finds[index] = parseInt(find)
-	})
-	const date = new Date()
-	date.setUTCDate(finds[0])
-	date.setUTCMonth(finds[1] - 1)
-	date.setUTCFullYear(eval(`20${finds[2]}`))
-	date.setUTCHours(finds[3])
-	date.setUTCMinutes(finds[4])
-	date.setUTCSeconds(0)
-	date.setUTCMilliseconds(0)
-	return date
+    const dateRegex = new RegExp(/[0-9]{1,2}/g)
+    const finds = m3content.match(dateRegex)
+    if (!finds || finds.length < 5) {
+        return null
+    }
+    finds.forEach((find, index) => {
+        finds[index] = parseInt(find)
+    })
+    const date = new Date()
+    date.setUTCDate(finds[0])
+    date.setUTCMonth(finds[1] - 1)
+    date.setUTCFullYear(eval(`20${finds[2]}`))
+    date.setUTCHours(finds[3])
+    date.setUTCMinutes(finds[4])
+    date.setUTCSeconds(0)
+    date.setUTCMilliseconds(0)
+    if (m3content.toLowerCase().includes("pm")) {
+        date.setUTCHours(date.getUTCHours() + 12)
+    }
+    return date
 }
 
 exports.run = (client, message, [eventID, option]) => {
-	if (!message.member.roles.cache.find(r => r.id === client.settings.manager)) {
+	if (!message.member.roles.cache.find(r => r.id === client.settings.organiser)) {
 		message.channel.send("You must be the event manager to do this!")
 		return
 	}
@@ -41,7 +44,7 @@ exports.run = (client, message, [eventID, option]) => {
 	}
 	eventID = parseInt(eventID)
 
-	const event = client.events.find(e => e.id === eventID)
+	const event = client.events.get(eventID)
 	if (!event) {
 		message.channel.send("That Event ID is not linked to an event")
 		return
@@ -59,19 +62,21 @@ exports.run = (client, message, [eventID, option]) => {
 			m.channel.awaitMessages(m=> m.author.id === message.author.id, {max:1}).then(collected => {
 				const m2 = collected.first()
 				event.setName(m2.content)
-				event.writeE()
-				m2.channel.send("The event was renamed to `" + event.name + "`")
+				event.write().then(() => {
+					m2.channel.send("The event was renamed to `" + event.name + "`")
+				})
 			})
 		})
 	} else 
 	if (option === "date") {
-		message.channel.send("What would you like the event's date to be? DD/MM/YY HH:MN").then(m => {
+		message.channel.send(`When should it be? DD/MM/YY HH:MN (am or pm)  or  "null"\nDate must be in GMT (UTC)`).then(m => {
 			m.channel.awaitMessages(m => m.author.id === message.author.id, {max: 1}).then(collected => {
 				const m2 = collected.first()
 				const foundDate = findDate(m2.content)
 				event.setDate(foundDate)
-				event.writeE()
-				message.channel.send(`${event.name} is now scheduled for \`${event.date ? event.date.toUTCString() : null}\``)
+				event.write().then(() => {
+					message.channel.send(`${event.name} is now scheduled for \`${event.date ? event.date.toUTCString() : null}\``)
+				})
 			})
 		})
 	} else 
@@ -84,8 +89,9 @@ exports.run = (client, message, [eventID, option]) => {
 					return
 				}
 				event.setMax(parseInt(m2.content))
-				event.writeE()
-				message.channel.send(`The event's maximum participants are now \`${event.max}\``)
+				event.write().then(() => {
+					message.channel.send(`The event's maximum participants are now \`${event.max}\``)
+				})
 			})
 		})
 	} else {

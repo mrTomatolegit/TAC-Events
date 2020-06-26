@@ -70,7 +70,7 @@ exports.run = (client, message, [selected]) => {
             aliases = aliases.trim()
             embed = embed.addField("Aliases", `${aliases}`)
         }
-        message.channel.send(embed)
+        message.channel.send({embed})
         return
     }
     const categories = constructCategories(client.commandManager.commands)
@@ -89,7 +89,7 @@ exports.run = (client, message, [selected]) => {
             list = list.trim()
             embed = embed.addField(sub.name, list)
         })
-        message.channel.send(embed)
+        message.channel.send({embed})
         return
     }
     let description = ""
@@ -105,5 +105,5 @@ exports.run = (client, message, [selected]) => {
         .setFooter(`Bot made by ${creator.tag}`, creator.avatarURL())
         .setColor("BLUE")
         .setTimestamp(new Date(client.config.createdAt))
-    message.channel.send(embed)
+    message.channel.send({embed})
 }

@@ -19,8 +19,9 @@ exports.run = (client, message, args) => {
         return
     }
     try {
-        eval(script)
+        console.log(eval(script))
     } catch(e) {
         message.channel.send(e.message)
+        console.error(e.stack)
     }
 }

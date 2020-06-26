@@ -1,0 +1,16 @@
+{
+  "name": "eventsapi",
+  "version": "1.0.0",
+  "description": "API to manage TAC Events",
+  "main": "index.js",
+  "scripts": {
+    "test": "node index.js"
+  },
+  "author": "mrtomatolegit",
+  "license": "ISC",
+  "dependencies": {
+    "discord.js": "^12.2.0",
+    "sqlite3": "^4.2.0"
+  },
+  "private": true
+}
