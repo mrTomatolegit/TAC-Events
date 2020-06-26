@@ -1,3 +1,5 @@
+const HypixelKeyManager = require("./src/managers/HypixelKeyManager");
+
 module.exports = {
     // Client
     Client: require("./src/client/Client"),
@@ -13,5 +15,6 @@ module.exports = {
     PlayerManager: require("./src/managers/PlayerManager"),
     ParticipantManager: require("./src/managers/ParticipantManager"),
     SettingsManager: require("./src/managers/SettingsManager"),
-    AnnounceManager: require("./src/managers/AnnounceManager")
+    AnnounceManager: require("./src/managers/AnnounceManager"),
+    HypixelKeyManager: require("./src/managers/HypixelKeyManager")
 }

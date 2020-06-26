@@ -54,7 +54,6 @@ class Event {
         if (this.date) {
             const date = new Date(this.date.getTime())
             date.setMinutes(date.getMinutes() - 10)
-            console.log("aaa")
             return date
         } else {
             return null
@@ -71,11 +70,9 @@ class Event {
             if (this.job) {
                 this.job.cancel()
             }
-            console.log(this.announceDate)
             this.job = schedule.scheduleJob(this.name, this.announceDate, () => {
                 this.announce()
             })
-            console.log("job", this.job)
         }
         return this
     }
@@ -151,7 +148,6 @@ class Event {
                     reject(err)
                     return
                 }
-                console.log(rows)
                 if (rows.length < 1) {
                     this.client.db.all(`INSERT INTO events(id, name, organiser, max, teams, date) VALUES($id, $name, $organiser, $max, $teams, $date)`, {
                         $id: this.id,

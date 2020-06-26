@@ -2,8 +2,6 @@ exports.load = (client, reload) => {
     if (reload) {
         return
     }
-    const Hypixel = require("hypixel")
-    client.hypixel = new Hypixel({ key: process.env.token });
 
     const request = require("request")
     client.mojang = {
@@ -19,8 +17,12 @@ exports.load = (client, reload) => {
                         resolve(null)
                         return
                     }
-                    const profile = JSON.parse(body)
-                    resolve(profile.id)
+                    try {
+                        const profile = JSON.parse(body)
+                        resolve(profile.id)
+                    } catch {
+                        resolve(null)
+                    }
                 })
             })
         },
@@ -36,8 +38,13 @@ exports.load = (client, reload) => {
                         resolve(null)
                         return
                     }
-                    const profile = JSON.parse(body)
-                    resolve(profile[profile.length-1] ?  profile[profile.length-1].name : null)
+                    try {
+                        const profile = JSON.parse(body)
+                        resolve(profile[profile.length-1] ?  profile[profile.length-1].name : null)
+                    }
+                    catch {
+                        resolve(null)
+                    }
                 })
             })
         }

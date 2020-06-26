@@ -45,7 +45,6 @@ class EventManager extends Collection {
 
     get unusedID() {
         const aa = this.last()
-        console.log(aa.id + 1)
         return aa ? aa.id + 1 : 1
     }
 

@@ -15,7 +15,6 @@ exports.run = (client, message, [eventID]) => {
 	}
 	eventID = parseInt(eventID)
 
-	console.log(client.events.find(e => e.canJoin == true))
 	
 	const event = client.events.get(eventID) || client.events.find(e => e.canJoin == true)
 	if (!event) {

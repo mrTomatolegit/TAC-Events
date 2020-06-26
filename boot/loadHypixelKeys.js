@@ -1,7 +1,8 @@
 exports.load = (client, reload) => {
     const keys = require("../hypixelKeys.json")
     const request = require("request")
-    client.keymanager = new client.HypixelKeyManager()
+    const EventsAPI = require("../EventsAPI")
+    client.keymanager = new EventsAPI.HypixelKeyManager()
 
     for (key of keys) {
         request(`https://api.hypixel.net/key?key=${key}`, (err, response, body) => {

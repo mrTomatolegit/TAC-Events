@@ -30,7 +30,6 @@ exports.run = (client, message, [roleID]) => {
         message.channel.send("I could not find that role in your server")
         return
     }
-    console.log(client.announcements)
     const registered = client.announcements.get(message.guild.id)
     if (!registered) {
         message.channel.send("You need to set an announcements channel to do that!")

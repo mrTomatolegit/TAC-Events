@@ -14,13 +14,9 @@ exports.run = (client, message, [setting]) => {
         return
     }
     const settings = {
-        announcements: {
-            description: "The id of the announcements channel",
-            type: "channel id"
-        },
-        manager: {
-            description: "The id of the event manager role",
-            type: "channel id"
+        organiser: {
+            description: "The id of the event organiser role",
+            type: "role id"
         }
     }
     if (setting) {
@@ -30,15 +26,31 @@ exports.run = (client, message, [setting]) => {
             message.channel.send(`What should ${setting} be? (${settings[setting].type})`)
             collector.on("collect", m => {
                 if (settings[setting].type === "channel id") {
-                    const channelRegex = new RegExp(/^[0-9]{18}$/)
-                    if (!channelRegex.test(m.content)) {
+                    const channelRegex = new RegExp(/[0-9]{18}/)
+                    const finds = m.content.match(channelRegex)
+                    if (!finds || finds.length < 1) {
                         m.channel.send("That isn't a channel id?")
                         return
+                    } else {
+                        m.content = finds[0]
                     }
                     client.settings[setting] = m.content
-                    client.db.all(`UPDATE settings SET ${setting} = $value`, {$value: m.content}, (err, rows) => {
-                        if (err) message.channel.send(err.message)
-                        message.channel.send(`${setting} was set to ${m.content}`)
+                    client.settings.write().then(() => {
+                        message.channel.send(`${setting} was set to ${client.settings[setting]}`)
+                    })
+                } else 
+                if (settings[setting].type === "role id") {
+                    const roleRegex = new RegExp(/[0-9]{18}/)
+                    const finds = m.content.match(roleRegex)
+                    if (!finds || finds.length < 1) {
+                        m.channel.send("That isn't a role id?")
+                        return
+                    } else {
+                        m.content = finds[0]
+                    }
+                    client.settings[setting] = m.content
+                    client.settings.write().then(() => {
+                        message.channel.send(`${setting} was set to ${client.settings[setting]}`)
                     })
                 }
             })

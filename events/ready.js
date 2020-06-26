@@ -6,9 +6,7 @@ module.exports = (client) => {
         client.players.fetch().then(() => {
             client.settings.fetch().then(() => {
                 client.announcements.fetch().then(() => {
-                    console.log('a')
                     client.events.fetch().then(events => {
-                        console.log("a")
                         events.forEach(event => {
                             event.participants.fetch().then(() => {
                                 resolve()
