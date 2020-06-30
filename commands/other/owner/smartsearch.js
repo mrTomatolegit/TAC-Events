@@ -70,7 +70,8 @@ exports.run = async (client, message, [sendlogs]) => {
             client.guilds.cache.forEach(guild => {
                 shit = guild.members.cache.size-1 + shit
                 for (let i = 0, p = Promise.resolve(); i < guild.members.cache.size - 1; i++) {
-                    p = p.then(_ => new Promise(resolve => {
+                    p = p.then(_ => new Promise(async resolve => {
+                        await new Promise((resolve) => setTimeout(() => {resolve()}, 500))
                         let index = Array.from(guild.members.cache.keys())[i]
                         let member = guild.members.cache.get(index)
                         let map = guild.members.cache
@@ -92,7 +93,7 @@ exports.run = async (client, message, [sendlogs]) => {
                         client.mojang.getUUID(escape(member.nickname) || escape(member.user.username)).then(async uuid => {
                             if (!uuid) {
                                 if (member.nickname) {
-                                    uuid = await client.mojang.getUUID(escape(member.user.username)).catch(() => {resolve()})
+                                    uuid = await client.mojang.getUUID(escape(member.user.username)).catch((e) => {resolve(); console.error(e)})
                                 }
                                 if (!uuid) {
                                     invalid.push(member)
@@ -124,10 +125,10 @@ exports.run = async (client, message, [sendlogs]) => {
                             registered.push(member)
                             searched.push(member)
                             const tacMember = tac.members.cache.get(member.user.id)
-                            tacMember ? tacMember.setNickname(hypixelPlayer.displayname).catch(() => {}) : null
+                            tacMember ? tacMember.setNickname(hypixelPlayer.displayname).catch((e) => {console.error(e)}) : null
                             if (isLast()) search.emit("done")
                             resolve()
-                        }).catch(() => resolve())
+                        }).catch((e) => {resolve(); console.error(e)})
                     }));
                 }
             })

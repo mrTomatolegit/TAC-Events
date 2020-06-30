@@ -16,7 +16,8 @@ exports.load = (client, reload) => {
             }
             const json = JSON.parse(body)
             if (!json.success) {
-                client.error(new Error(`Invalid API key ${key}`))
+                client.error(new Error(`${json.cause} ${key}`))
+                return
             }
             client.keymanager.add(key)
         })
