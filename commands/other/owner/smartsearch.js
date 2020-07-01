@@ -90,7 +90,7 @@ exports.run = async (client, message, [sendlogs]) => {
                             logger.log(`${member.user.tag} is already registered`)
                             return resolve()
                         }
-                        client.mojang.getUUID(escape(member.nickname) || escape(member.user.username)).then(async uuid => {
+                        client.mojang.getUUID(member.nickname ? escape(member.nickname) : escape(member.user.username)).then(async uuid => {
                             if (!uuid) {
                                 if (member.nickname) {
                                     uuid = await client.mojang.getUUID(escape(member.user.username)).catch((e) => {resolve(); console.error(e)})
@@ -103,8 +103,8 @@ exports.run = async (client, message, [sendlogs]) => {
                                     return resolve()
                                 }
                             }
-                            const hypixelPlayer = hypixelCache.get(member.user.id) || await client.keymanager.next().getPlayer(uuid)
-                            hypixelCache.set(member.user.id, hypixelPlayer)
+                            const hypixelPlayer = hypixelCache.get(uuid) || await client.keymanager.next().getPlayer(uuid)
+                            hypixelCache.set(uuid, hypixelPlayer)
                             if (!hypixelPlayer || !hypixelPlayer.socialMedia || !hypixelPlayer.socialMedia.links || !hypixelPlayer.socialMedia.links.DISCORD) {
                                 unmatched.push(member)
                                 searched.push(member)

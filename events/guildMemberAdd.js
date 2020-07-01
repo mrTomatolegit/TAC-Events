@@ -16,7 +16,7 @@ module.exports = (client, newMember) => {
                 logger.log(`${member.user.tag} is already registered`)
                 return
             }
-            client.mojang.getUUID(escape(member.nickname) || escape(member.user.username)).then(async uuid => {
+            client.mojang.getUUID(member.nickname ? escape(member.nickname) : escape(member.user.username)).then(async uuid => {
                 if (!uuid) {
                     if (member.nickname) {
                         uuid = await client.mojang.getUUID(escape(member.user.username)).catch(() => {})
