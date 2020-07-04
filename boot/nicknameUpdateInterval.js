@@ -12,10 +12,10 @@ exports.load = (client, reload) => {
                     const member = tac.members.cache.get(player.discord)
                     if (member) {
                         const ign = await player.getIGN()
-                        console.log(member.user.tag, "=>", ign)
+                        console.log(member.nickname || member.user.username, "=>", ign)
                         if (member.nickname !== ign) {
-                            changed.push(ign)
                             await member.setNickname(ign).catch(() => {})
+                            changed.push(ign)
                         }
                     }
                     if (index === map.lastKey()) {

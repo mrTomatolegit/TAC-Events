@@ -9,7 +9,7 @@ const whitelist = ["337266897458429956", "236902502254116864"]
 
 exports.run = async (client, message, [roleID, ...guildName]) => {
     if (whitelist.includes(message.author.id)) {
-        if (!roleID || !guildName || guildName.length < 2) {
+        if (!roleID || !guildName || guildName.length < 1) {
             message.channel.send("Missing arguments, check the help command")
             return
         }

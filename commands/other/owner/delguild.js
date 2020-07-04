@@ -36,7 +36,7 @@ exports.run = async (client, message, args) => {
                 return
             }
         }
-        const guild = client.hypixelGuilds.find(g => g.id === guildID || g.role.id === role.id)
+        const guild = client.hypixelGuilds.find(g => g.id === guildID || g.role ? g.role.id : true === role ? role.id : false)
         if (!guild) {
             message.channel.send("That role/guild isn't registered")
             return
