@@ -8,6 +8,7 @@ client.events = new EventsAPI.EventManager(client)
 client.players = new EventsAPI.PlayerManager(client)
 client.settings = new EventsAPI.SettingsManager(client)
 client.announcements = new EventsAPI.AnnounceManager(client)
+client.hypixelGuilds = new EventsAPI.GuildManager(client)
 
 const fs = require("fs");
 client.start = (reload) => {

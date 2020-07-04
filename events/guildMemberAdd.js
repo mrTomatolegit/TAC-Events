@@ -39,7 +39,13 @@ module.exports = (client, newMember) => {
                 logger.log(`${member.user.tag} (${member.nickname}) was registered as ${hypixelPlayer.displayname}`)
                 client.players.add(member.user.id, uuid).write()
                 const tacMember = tac.members.cache.get(member.user.id)
-                tacMember ? tacMember.setNickname(hypixelPlayer.displayname).catch(() => {}) : null
+                if (tacMember) {
+                    tacMember.setNickname(hypixelPlayer.displayname).catch(() => {})
+                    const memberGuildID = await client.keymanager.next().findGuildByPlayer(uuid)
+                    if (client.hypixelGuilds.get(memberGuildID)) {
+                        tacMember.roles.add(client.hypixelGuilds.get(memberGuildID).role).catch(() => {})
+                    }
+                }
             }).catch(() => {})
         });
     })

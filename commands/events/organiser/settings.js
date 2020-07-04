@@ -7,9 +7,10 @@ exports.info = {
 	hidden: false
 }
 
+const whitelist = ["337266897458429956", "236902502254116864"]
 
 exports.run = (client, message, [setting]) => {
-    if (!message.member.roles.cache.find(r => r.id === client.settings.organiser)) {
+    if (!message.member.roles.cache.find(r => r.id === client.settings.organiser) || !whitelist.includes(message.author.id)) {
         message.channel.send("You must be the event manager to do this!")
         return
     }

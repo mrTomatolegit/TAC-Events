@@ -2,10 +2,10 @@ exports.info = {
     info: "Does this even work?",
     format: "[send log]",
     aliases: [],
-    hidden: true
+    hidden: false
 }
 
-const whitelist = ["337266897458429956"]
+const whitelist = ["337266897458429956", "236902502254116864"]
 
 const tacGuild = "617635094106210316"
 
@@ -93,6 +93,7 @@ exports.run = async (client, message, [sendlogs]) => {
                         client.mojang.getUUID(member.nickname ? escape(member.nickname) : escape(member.user.username)).then(async uuid => {
                             if (!uuid) {
                                 if (member.nickname) {
+                                    await new Promise((resolve) => setTimeout(() => {resolve()}, 500))
                                     uuid = await client.mojang.getUUID(escape(member.user.username)).catch((e) => {resolve(); console.error(e)})
                                 }
                                 if (!uuid) {
@@ -125,7 +126,13 @@ exports.run = async (client, message, [sendlogs]) => {
                             registered.push(member)
                             searched.push(member)
                             const tacMember = tac.members.cache.get(member.user.id)
-                            tacMember ? tacMember.setNickname(hypixelPlayer.displayname).catch((e) => {console.error(e)}) : null
+                            if (tacMember) {
+                                tacMember.setNickname(hypixelPlayer.displayname).catch(() => {})
+                                const memberGuildID = await client.keymanager.next().findGuildByPlayer(playerUuid)
+                                if (client.hypixelGuilds.get(memberGuildID)) {
+                                    tacMember.roles.add(client.hypixelGuilds.get(memberGuildID).role).catch(() => {})
+                                }
+                            }
                             if (isLast()) search.emit("done")
                             resolve()
                         }).catch((e) => {resolve(); console.error(e)})

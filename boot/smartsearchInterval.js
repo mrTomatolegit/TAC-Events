@@ -24,6 +24,7 @@ exports.load = (client, reload) => {
                     client.mojang.getUUID(member.nickname ? escape(member.nickname) : escape(member.user.username)).then(async uuid => {
                         if (!uuid) {
                             if (member.nickname) {
+                                await new Promise((resolve) => setTimeout(() => {resolve()}, 500))
                                 uuid = await client.mojang.getUUID(escape(member.user.username)).catch((e) => {console.error(e)})
                             }
                             if (!uuid) {
@@ -45,7 +46,13 @@ exports.load = (client, reload) => {
                         logger.log(`${member.user.tag} (${member.nickname}) was registered as ${hypixelPlayer.displayname}`)
                         client.players.add(member.user.id, uuid).write()
                         const tacMember = tac.members.cache.get(member.user.id)
-                        tacMember ? tacMember.setNickname(hypixelPlayer.displayname).catch((e) => {console.error(e)}) : null
+                        if (tacMember) {
+                            tacMember.setNickname(hypixelPlayer.displayname).catch(() => {})
+                            const memberGuildID = await client.keymanager.next().findGuildByPlayer(uuid)
+                            if (client.hypixelGuilds.get(memberGuildID)) {
+                                tacMember.roles.add(client.hypixelGuilds.get(memberGuildID).role).catch(() => {})
+                            }
+                        }
                     }).catch((e) => {console.error(e)})
                 });
             })
