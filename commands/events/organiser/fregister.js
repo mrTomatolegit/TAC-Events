@@ -28,9 +28,15 @@ exports.run = async (client, message, [discord, minecraft]) => {
     }
 
     const tac = client.guilds.cache.get(tacGuild)
-    const member  = tac.members.cache.get(user.id)
-    if (member) member.setNickname(await client.mojang.getName(mc))
-
+    const tacMember  = tac.members.cache.get(user.id)
+    if (tacMember) tacMember.setNickname(await client.mojang.getName(mc))
+    if (tacMember) {
+        tacMember.roles.add("730086771198525482")
+        const memberGuildID = await client.keymanager.next().findGuildByPlayer(uuid)
+        if (client.hypixelGuilds.get(memberGuildID)) {
+            tacMember.roles.add(client.hypixelGuilds.get(memberGuildID).role).catch(() => {})
+        }
+    }
     client.players.add(user.id, mc).write().then(() => {
         message.channel.send("ok")
     })
