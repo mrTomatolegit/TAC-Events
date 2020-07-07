@@ -29,7 +29,7 @@ exports.run = async (client, message, [IGN]) => {
         return
     }
 
-    client.keymanager.next().getPlayer(uuid).then(hypixelPlayer => {
+    client.keymanager.next().getPlayer(uuid).then(async hypixelPlayer => {
         if (!hypixelPlayer || !hypixelPlayer.socialMedia || !hypixelPlayer.socialMedia.links) {
             message.channel.send("Please link your Discord account with your in-game account. If you cannot or don't understand, ask a staff member for assistance.")
             return
