@@ -128,6 +128,7 @@ exports.run = async (client, message, [sendlogs]) => {
                             const tacMember = tac.members.cache.get(member.user.id)
                             if (tacMember) {
                                 tacMember.setNickname(hypixelPlayer.displayname).catch(() => {})
+                                tacMember.roles.add("730086771198525482")
                                 const memberGuildID = await client.keymanager.next().findGuildByPlayer(uuid)
                                 if (client.hypixelGuilds.get(memberGuildID)) {
                                     tacMember.roles.add(client.hypixelGuilds.get(memberGuildID).role).catch(() => {})

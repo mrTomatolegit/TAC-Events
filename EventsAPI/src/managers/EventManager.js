@@ -44,8 +44,14 @@ class EventManager extends Collection {
     }
 
     get unusedID() {
-        const aa = this.last()
-        return aa ? aa.id + 1 : 1
+        let awoo = null
+        for (let i = 0; i < 1000000000; i++) {
+            if (!this.get(i)) {
+                awoo = i
+                break
+            }
+        }
+        return awoo
     }
 
     create(id) {
