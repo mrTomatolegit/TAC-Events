@@ -1,24 +1,24 @@
 exports.info = {
     info: "Registers a user tag by \"force\"",
-	format: "<discord tag> <minecraft ign>",
-	aliases: ["options"],
+	format: "<minecraft ign> <discord tag>",
+	aliases: [],
 	hidden: false
 }
 
 const tacGuild = "617635094106210316"
 
-exports.run = async (client, message, [discord, minecraft]) => {
-    
+exports.run = async (client, message, [minecraft, ...discord]) => {
+    discord = discord.join(" ")
     if (!message.member.roles.cache.find(r => r.id === client.settings.organiser)) {
         message.channel.send("You must be the event manager to do this!")
         return
     }
 
-    const user = client.users.cache.find(u => u.tag.toLowerCase() === discord.toLowerCase())
+    const user = client.users.cache.find(u => u.tag.toLowerCase() === discord.toLowerCase()) || client.users.cache.find(u => u.id === discord)
     const mc = await client.mojang.getUUID(minecraft)
 
     if (!user) {
-        message.channel.send("That's not a tag!")
+        message.channel.send("That's not a tag/id!")
         return
     }
 
