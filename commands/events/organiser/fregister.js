@@ -32,7 +32,7 @@ exports.run = async (client, message, [discord, minecraft]) => {
     if (tacMember) tacMember.setNickname(await client.mojang.getName(mc))
     if (tacMember) {
         tacMember.roles.add("730086771198525482")
-        const memberGuildID = await client.keymanager.next().findGuildByPlayer(uuid)
+        const memberGuildID = await client.keymanager.next().findGuildByPlayer(mc)
         if (client.hypixelGuilds.get(memberGuildID)) {
             tacMember.roles.add(client.hypixelGuilds.get(memberGuildID).role).catch(() => {})
         }
