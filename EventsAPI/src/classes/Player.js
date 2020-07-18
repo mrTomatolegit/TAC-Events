@@ -23,16 +23,23 @@ class Player {
         return this.client.users.cache.get(this.discord)
     }
 
-    getIGN() {
-        return this.client.mojang.getName(this.minecraft)
+    async getIGN() {
+        return await this.client.mojang.getName(this.minecraft)
     }
 
     async update() {
         const member = this.client.guilds.cache.get("617635094106210316").members.cache.get(this.discord)
         if (member) {
             member.setNickname(await this.getIGN())
-            const memberGuildID = await this.client.keymanager.next().findGuildByPlayer(this.minecraft)
-            if (this.client.hypixelGuilds.get(memberGuildID)) {
+            const memberGuildID = await this.client.keymanager.next().findGuildByPlayer(this.minecraft).catch(() => {})
+            if (this.client.hypixelGuilds.get(memberGuildID) && this.client.hypixelGuilds.get(memberGuildID).role) {
+                let removeRoles = []
+                this.client.hypixelGuilds.forEach(guild => {
+                    if (guild.role && guild.role.id !== this.client.hypixelGuilds.get(memberGuildID).role.id) {
+                        removeRoles.push(guild.role)
+                    }
+                })
+                await member.roles.remove(removeRoles).catch(() => {})
                 await member.roles.add(this.client.hypixelGuilds.get(memberGuildID).role).catch(() => {})
             }
         }
