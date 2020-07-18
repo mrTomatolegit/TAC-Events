@@ -10,6 +10,7 @@ module.exports = {
     Player: require("./src/classes/Player"),
     Announce: require("./src/classes/Announce"),
     Guild: require("./src/classes/Guild"),
+    SmartSearch: require("./src/classes/SmartSearch"),
 
     // Managers
     EventManager: require("./src/managers/EventManager"),

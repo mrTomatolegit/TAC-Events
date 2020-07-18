@@ -29,9 +29,7 @@ exports.load = (client, reload) => {
     }
 
     const schedule = require("node-schedule")
-    client.nicknameUpdateJob = schedule.scheduleJob("nicknameUpdateJob","0 */2 * * *", async () => {
-        this.updateNicknames().then((e) => {
-            console.log("Automatic nickname updater changed names: ", e)
-        })
+    client.nicknameUpdateJob = schedule.scheduleJob("nicknameUpdateJob","0 */4 * * *", async () => {
+        this.updateNicknames()
     })
 }

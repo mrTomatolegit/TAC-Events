@@ -27,6 +27,18 @@ class Player {
         return this.client.mojang.getName(this.minecraft)
     }
 
+    async update() {
+        const member = this.client.guilds.cache.get("617635094106210316").members.cache.get(this.discord)
+        if (member) {
+            member.setNickname(await this.getIGN())
+            const memberGuildID = await this.client.keymanager.next().findGuildByPlayer(this.minecraft)
+            if (this.client.hypixelGuilds.get(memberGuildID)) {
+                await member.roles.add(this.client.hypixelGuilds.get(memberGuildID).role).catch(() => {})
+            }
+        }
+        return this
+    }
+
     write() {
         return new Promise((resolve, reject) => {
             this.client.db.all(`SELECT * FROM players WHERE discord = $discord OR minecraft = $minecraft`, {
