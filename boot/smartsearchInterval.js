@@ -6,7 +6,7 @@ exports.load = (client, reload) => {
     }
     const schedule = require("node-schedule")
     client.smartsearchJob = schedule.scheduleJob("smartsearchJob", "0 0 * * */1", () => {
-        const smartSearch = new SmartSearch()
+        const smartSearch = new SmartSearch(client)
 
         smartSearch.globalSearch()
     })

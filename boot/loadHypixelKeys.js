@@ -14,9 +14,13 @@ exports.load = (client, reload) => {
                 client.error(new Error(`No response from hypixel api, key: ${key}`))
                 return
             }
-            const json = JSON.parse(body)
-            if (!json.success) {
-                client.error(new Error(`Invalid API key ${key}`))
+            try { 
+                const json = JSON.parse(body)
+                if (!json.success) {
+                    client.error(new Error(`Invalid API key ${key}`))
+                }
+            } catch {
+                console.error(body)
             }
             client.keymanager.add(key)
         })

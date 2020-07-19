@@ -1,4 +1,8 @@
 module.exports = (client, message) => {
+    if (message.channel.id === "731308952238817302") {
+        message.delete({timeout: 30000}).catch(() => {})
+    }
+
     if (message.author.bot) return
 
     if (message.channel.type === "dm") {
@@ -6,7 +10,7 @@ module.exports = (client, message) => {
             return
         }
     }
-
+    
     if (!message.content.startsWith(client.config.prefix)) return
 
     const args = message.content.slice(client.config.prefix.length).trim().split(/ +/g);
