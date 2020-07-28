@@ -29,12 +29,14 @@ exports.run = async (client, message, [minecraft, ...discord]) => {
 
     const tac = client.guilds.cache.get(tacGuild)
     const tacMember  = tac.members.cache.get(user.id)
+    let rolesAssigned = [tac.roles.cache.get("730086771198525482") ? tac.roles.cache.get("730086771198525482").name : null]
     if (tacMember) tacMember.setNickname(await client.mojang.getName(mc))
     if (tacMember) {
         tacMember.roles.add("730086771198525482")
-        const memberGuildID = await client.keymanager.next().findGuildByPlayer(mc)
-        if (client.hypixelGuilds.get(memberGuildID)) {
+        const memberGuildID = await client.keymanager.next().findGuildByPlayer(uuid)
+        if (client.hypixelGuilds.get(memberGuildID) && client.hypixelGuilds.get(memberGuildID).role) {
             tacMember.roles.add(client.hypixelGuilds.get(memberGuildID).role).catch(() => {})
+            rolesAssigned.push(client.hypixelGuilds.get(memberGuildID).role.name)
         }
     }
     client.players.add(user.id, mc).write().then(() => {
