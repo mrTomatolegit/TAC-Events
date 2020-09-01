@@ -1,7 +1,7 @@
 require('dotenv').config()
 const Discord = require("discord.js");
 const EventsAPI = require("./EventsAPI")
-const client = new Discord.Client();
+const client = new Discord.Client({partials: ["REACTION", "USER", "MESSAGE"]});
 const sqlite = require("sqlite3")
 client.db = new sqlite.Database("./EventsAPI/src/client/TACEvents.db")
 client.events = new EventsAPI.EventManager(client)
@@ -9,6 +9,7 @@ client.players = new EventsAPI.PlayerManager(client)
 client.settings = new EventsAPI.SettingsManager(client)
 client.announcements = new EventsAPI.AnnounceManager(client)
 client.hypixelGuilds = new EventsAPI.GuildManager(client)
+client.prms = new EventsAPI.ParticipationRMsManager(client)
 
 const fs = require("fs");
 client.start = (reload) => {

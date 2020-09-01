@@ -24,7 +24,7 @@ class AnnounceManager extends Collection {
                         this.set(channel.guild.id, new Announce(this, channel, role))
                     }
                 })
-                resolve()
+                resolve(this)
             })
         })
     }

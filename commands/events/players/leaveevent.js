@@ -21,7 +21,7 @@ exports.run = (client, message, [eventID]) => {
 		return
 	}
 
-	if (!event.isListed(player)) {
+	if (!event.participants.get(player.discord)) {
 		message.channel.send("You are not signed up for `" + event.name + "`!")
 		return
 	}

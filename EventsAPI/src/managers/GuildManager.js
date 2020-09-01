@@ -18,6 +18,8 @@ class GuildManager extends Collection {
                 rows.forEach(row => {
                     this.add(row.guild).setRole(row.role).setElo(row.elo)
                 })
+
+                resolve(this)
             })
         })
     }

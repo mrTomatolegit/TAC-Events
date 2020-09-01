@@ -12,6 +12,7 @@ module.exports = {
     Guild: require("./src/classes/Guild"),
     SmartSearch: require("./src/classes/SmartSearch"),
     PlayerUpdater: require("./src/classes/PlayerUpdater"),
+    ParticipationRM: require("./src/classes/ParticipationRM"),
 
     // Managers
     EventManager: require("./src/managers/EventManager"),
@@ -20,5 +21,6 @@ module.exports = {
     SettingsManager: require("./src/managers/SettingsManager"),
     AnnounceManager: require("./src/managers/AnnounceManager"),
     HypixelKeyManager: require("./src/managers/HypixelKeyManager"),
-    GuildManager: require("./src/managers/GuildManager")
+    GuildManager: require("./src/managers/GuildManager"),
+    ParticipationRMsManager: require("./src/managers/ParticipationRMsManager")
 }

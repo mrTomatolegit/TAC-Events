@@ -4,7 +4,8 @@ const EventManager = require("../managers/EventManager");
 const sqlite = require("sqlite3");
 const PlayerManager = require("../managers/PlayerManager");
 const SettingsManager = require("../managers/SettingsManager");
-const path = require("path")
+const path = require("path");
+const ParticipationRMsManager = require("../managers/ParticipationRMsManager");
 const db = new sqlite.Database("./EventsAPI/src/client/TACEvents.db")
 
 class NewClient extends Client{
@@ -17,6 +18,7 @@ class NewClient extends Client{
         this.events = new EventManager(this)
         this.players = new PlayerManager(this)
         this.settings = new SettingsManager(this)
+        this.prms = new ParticipationRMsManager(this)
         this.db = db
     }
 
@@ -32,6 +34,8 @@ class NewClient extends Client{
                                 reject(e)
                             })
                         })
+                    }).then(() => {
+                        this.prms.fetch()
                     }).catch(e => {
                         reject(e)
                     })

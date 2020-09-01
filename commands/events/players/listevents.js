@@ -47,18 +47,12 @@ exports.run = (client, message, [eventID]) => {
 			let left
 			let right
 			new Promise((resolve) => {
-				console.log(event.participants)
-				console.log(event.participants.size)
 				if (event.participants) {
-					console.log("shit")
 					let i = 0
 					event.participants.forEach(async (p, index, map) => {
-						console.log("works")
 						p.player.getIGN().then(IGN => {
-							console.log("aaa")
 							left = `${left || ""}${p.player.user}\n`
 							right = `${right || ""}${IGN}`
-							console.log(index, map.size - 1)
 							if (i === map.size-1) resolve()
 							i++
 						})
@@ -67,13 +61,12 @@ exports.run = (client, message, [eventID]) => {
 					resolve()
 				}
 			}).then(() => {
-				console.log("aa2aa")
 				const organiser = client.users.cache.get(event.organiser)
 				const embed = new Discord.MessageEmbed()
 					.setTitle(event.name)
 					.setDescription(`An event registered using ${client.user}`)
 					.setThumbnail(message.guild.iconURL())
-					.setFooter(message.guild.name, message.guild.iconURL())
+					.setFooter(`Event ID: ${event.id}`, message.guild.iconURL())
 					.setTimestamp(event.date)
 					.addField("Organiser", organiser ? `${organiser.tag} ||${organiser}||` : event.organiser)
 					.addField("Date", event.date ? event.date.toUTCString(): "No date")
@@ -96,7 +89,6 @@ exports.run = (client, message, [eventID]) => {
 	let page = 0
 	const maxPages = Math.floor((client.events.size - 1) / eventsPerPage)
 	let firstEmbed = embed.setDescription(getPage(page))
-	console.log(firstEmbed)
 	message.channel.send(firstEmbed).then(m => {
 		emojis.forEach(async emoji => {
 			await m.react(emoji)

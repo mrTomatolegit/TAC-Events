@@ -13,7 +13,18 @@ class PlayerManager extends Collection{
     }
 
     remove(id) {
-        this.remove(id)
+        this.delete(id)
+
+        this.client.db.all(`DELETE FROM players WHERE discord = $discord`, {$discord: id}, (err, rows) => {
+            if (err) {
+                reject(err)
+                return 
+            }
+            rows.forEach(row => {
+                this.add(row.discord, row.minecraft).setRegistryDate(new Date(row.registeredAt))
+            })
+            resolve()
+        })
     }
 
     fetch() {
@@ -26,7 +37,7 @@ class PlayerManager extends Collection{
                 rows.forEach(row => {
                     this.add(row.discord, row.minecraft).setRegistryDate(new Date(row.registeredAt))
                 })
-                resolve()
+                resolve(this)
             })
         })
     }

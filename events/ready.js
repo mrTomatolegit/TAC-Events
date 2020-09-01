@@ -8,6 +8,7 @@ module.exports = (client) => {
     console.log(`${client.user.tag} has connected to discord!`)
 
     return new Promise((resolve, reject) => {
+        client.prms.fetch()
         client.players.fetch().then(() => {
             client.settings.fetch().then(() => {
                 client.announcements.fetch().then(() => {

@@ -1,4 +1,5 @@
 module.exports = (client, message) => {
+    if (message.partial) return
     if (message.channel.id === "731308952238817302") {
         message.delete({timeout: 30000}).catch(() => {})
     }
