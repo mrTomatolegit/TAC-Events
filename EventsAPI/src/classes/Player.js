@@ -30,7 +30,7 @@ class Player {
     async update() {
         const member = this.client.guilds.cache.get("617635094106210316").members.cache.get(this.discord)
         if (member) {
-            member.setNickname(await this.getIGN())
+            member.setNickname(await this.getIGN()).catch(() => {})
             member.roles.add("730086771198525482").catch(() => {})
             const memberGuildID = await this.client.keymanager.next().findGuildByPlayer(this.minecraft).catch(() => {})
             if (this.client.hypixelGuilds.get(memberGuildID) && this.client.hypixelGuilds.get(memberGuildID).role) {

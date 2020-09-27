@@ -93,11 +93,11 @@ class SmartSearch {
             if (this.finished) {
                 clearInterval(this.checkWorkingInterval)
             } else
-            if (this.searched === this.searched20secondsago) {
+            if (this.searched === this.searched120secondsago) {
                 this.stop();
             }
-            this.searched20secondsago = this.searched
-        }, 20000)
+            this.searched120secondsago = this.searched
+        }, 120000)
         for (let member of this.allMembers) {
             if (!this.stopped) {
                 if (member.user.bot) {
@@ -120,7 +120,20 @@ class SmartSearch {
                         this.invalid++
                         this.searched++
                     } else {
-                        const hypixelPlayer = this.hypixelCache.get(uuid) || await this.getPlayer(uuid, delayInMilliseconds)
+                        let hypixelPlayer
+                        if (this.hypixelCache.get(uuid)) {
+                            return this.hypixelCache.get(uuid)
+                        } else {
+                            hypixelPlayer = await this.getPlayer(uuid, delayInMilliseconds).catch(async () => {
+                                await new Promise((resolve) => {
+                                    setTimeout(() => {
+                                        resolve()
+                                    }, 60000)
+                                })
+                                hypixelPlayer = await this.getPlayer(uuid, delayInMilliseconds).catch(() => {})
+                            })
+                        }
+
                         this.hypixelCache.set(uuid, hypixelPlayer)
 
                         if (!hypixelPlayer || !hypixelPlayer.socialMedia || !hypixelPlayer.socialMedia.links || !hypixelPlayer.socialMedia.links.DISCORD) {
@@ -178,18 +191,18 @@ class SmartSearch {
                 }
                 const hypixelPlayer = this.hypixelCache.get(uuid) || await this.getPlayer(uuid, delayInMilliseconds)
                 this.hypixelCache.set(uuid, hypixelPlayer)
-    
+
                 if (!hypixelPlayer || !hypixelPlayer.socialMedia || !hypixelPlayer.socialMedia.links || !hypixelPlayer.socialMedia.links.DISCORD) {
                     return null
                 }
                 const hypixelTag = hypixelPlayer.socialMedia.links.DISCORD
-    
+
                 if (member.user.tag !== hypixelTag) {
                     return null
                 }
-    
+
                 this.client.players.add(member.user.id, uuid).write()
-    
+
                 const tacMember = this.client.guilds.cache.get("617635094106210316").members.cache.get(member.user.id)
                 if (tacMember) {
                     tacMember.setNickname(hypixelPlayer.displayname).catch(() => {})
